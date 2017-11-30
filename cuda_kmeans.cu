@@ -173,14 +173,15 @@ void compute_delta(int *deviceIntermediates,
     extern __shared__ unsigned int intermediates[];
 
     //  Copy global intermediate values into shared memory.
+    int threadIdxX=threadIdx.x;
     intermediates[threadIdx.x] =
-        (threadIdx.x < numIntermediates) ? deviceIntermediates[threadIdx.x] : 0;
+        (threadIdxX < numIntermediates) ? deviceIntermediates[threadIdxX] : 0;
 
     __syncthreads();
 
     //  numIntermediates2 *must* be a power of two!
     for (unsigned int s = numIntermediates2 / 2; s > 0; s >>= 1) {
-        if (threadIdx.x < s) {
+        if (threadIdxX < s) {
             intermediates[threadIdx.x] += intermediates[threadIdx.x + s];
         }
         __syncthreads();
