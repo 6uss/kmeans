@@ -53,7 +53,7 @@ int main(){
   cudaMalloc(&d_min_rand_int, sizeof(unsigned));  
   h_min_rand_int = (unsigned *)malloc(sizeof(unsigned));
   cudaMemset(d_result, 0, (MAX-MIN+1)*sizeof(unsigned));
-  setup_kernel<<<1,>>>(d_state);
+  setup_kernel<<<1,1>>>(d_state);
 
   *h_max_rand_int = MAX;
   *h_min_rand_int = MIN;

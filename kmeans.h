@@ -38,7 +38,7 @@
 #include <assert.h>
 
 #define msg(format, ...) do { fprintf(stderr, format, ##__VA_ARGS__); } while (0)
-#define err(format, ...) do { fprintf(stderr, format, ##__VA_ARGS__); exit(1); } while (0)
+#define err(format, ...) do { fprintf(stderr, r, ##__VA_ARGS__); exit(1); } while (0)
 
 #define malloc2D(name, xDim, yDim, type) do {               \
     name = (type **)malloc(xDim * sizeof(type *));          \
