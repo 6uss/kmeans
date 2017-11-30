@@ -53,7 +53,8 @@ static inline int nextPowerOfTwo(int n) {
     n = n >>  4 | n;
     n = n >>  8 | n;
     n = n >> 16 | n;
-//  n = n >> 32 | n;    //  For 64-bit ints
+    n = n >> 32 | n;    //  For 64-bit ints
+    n = n >> 128 | n;    //  For 128-bit ints
 
     return ++n;
 }
@@ -71,10 +72,13 @@ float euclid_dist_2(int    numCoords,
 {
     int i;
     float ans=0.0;
+    float temp=0.0;
 
     for (i = 0; i < numCoords; i++) {
-        ans += (objects[numObjs * i + objectId] - clusters[numClusters * i + clusterId]) *
-               (objects[numObjs * i + objectId] - clusters[numClusters * i + clusterId]);
+        // ans += (objects[numObjs * i + objectId] - clusters[numClusters * i + clusterId]) *
+        //        (objects[numObjs * i + objectId] - clusters[numClusters * i + clusterId])
+        temp=(objects[numObjs * i + objectId] - clusters[numClusters * i + clusterId]);//decrease the memory access from 4 to 2
+        ans += temp*temp;
     }
 
     return(ans);
@@ -109,6 +113,7 @@ void find_nearest_cluster(int numCoords,
     //  clusters or too many coordinates! For reference, a Tesla C1060 has 16
     //  KiB of shared memory per block, and a GeForce GTX 480 has 48 KiB of
     //  shared memory per block.
+    // K20-> Total amount of shared memory per block:       49152 bytes
     for (int i = threadIdx.x; i < numClusters; i += blockDim.x) {
         for (int j = 0; j < numCoords; j++) {
             clusters[numClusters * j + i] = deviceClusters[numClusters * j + i];
@@ -138,9 +143,11 @@ void find_nearest_cluster(int numCoords,
             }
         }
 
-        if (membership[objectId] != index) {
+        /*if (membership[objectId] != index) {
             membershipChanged[threadIdx.x] = 1;
-        }
+        }*/
+
+        membershipChanged[threadIdx.x]=(membership[objectId] != index)//removed if //todo
 
         /* assign the membership to object objectId */
         membership[objectId] = index;
@@ -151,7 +158,7 @@ void find_nearest_cluster(int numCoords,
         for (unsigned int s = blockDim.x / 2; s > 0; s >>= 1) {
             if (threadIdx.x < s) {
                 membershipChanged[threadIdx.x] +=
-                    membershipChanged[threadIdx.x + s];
+                           membershipChanged[threadIdx.x + s];
             }
             __syncthreads();
         }
@@ -185,7 +192,7 @@ void compute_delta(int *deviceIntermediates,
         }
         __syncthreads();
     }
-
+// todo
     if (threadIdx.x == 0) {
         deviceIntermediates[0] = intermediates[0];
     }
@@ -231,6 +238,7 @@ float** cuda_kmeans(float **objects,      /* in: [numObjs][numCoords] */
     //  Copy objects given in [numObjs][numCoords] layout to new
     //  [numCoords][numObjs] layout
     malloc2D(dimObjects, numCoords, numObjs, float);
+
     for (i = 0; i < numCoords; i++) {
         for (j = 0; j < numObjs; j++) {
             dimObjects[i][j] = objects[j][i];
@@ -246,7 +254,9 @@ float** cuda_kmeans(float **objects,      /* in: [numObjs][numCoords] */
     }
 
     /* initialize membership[] */
-    for (i=0; i<numObjs; i++) membership[i] = -1;
+    for (i=0; i<numObjs; i++) 
+        membership[i] = -1;
+
 
     /* need to initialize newClusterSize and newClusters[0] to all 0 */
     newClusterSize = (int*) calloc(numClusters, sizeof(int));
@@ -262,6 +272,7 @@ float** cuda_kmeans(float **objects,      /* in: [numObjs][numCoords] */
     const unsigned int numThreadsPerClusterBlock = 128;
     const unsigned int numClusterBlocks =
         (numObjs + numThreadsPerClusterBlock - 1) / numThreadsPerClusterBlock;
+
 #if BLOCK_SHARED_MEM_OPTIMIZATION
     const unsigned int clusterBlockSharedDataSize =
         numThreadsPerClusterBlock * sizeof(unsigned char) +
