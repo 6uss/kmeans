@@ -23,7 +23,7 @@ __global__ void generate_kernel(curandState *my_curandstate, const unsigned int 
   int count = 0;
   while (count < n){
     float myrandf = curand_uniform(my_curandstate+idx);
-    msg(myrandf);
+    // msg(myrandf);
     myrandf *= (max_rand_int[idx] - min_rand_int[idx]+0.999999);
     myrandf += min_rand_int[idx];
     int myrand = (int)truncf(myrandf);
