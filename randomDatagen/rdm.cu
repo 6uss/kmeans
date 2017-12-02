@@ -74,7 +74,7 @@ int main(){
 
   for (int i = 0; i < DSIZE;)
   {
-    printf("%.6f %.6f %.6f %.6f %.6f %.6f %.6f %.6f %.6f" ,
+    printf("%.6f %.6f %.6f %.6f %.6f %.6f %.6f %.6f %.6f \n" ,
      h_result[i++], h_result[i++], h_result[i++],
      h_result[i++], h_result[i++], h_result[i++],
      h_result[i++], h_result[i++], h_result[i++]);
