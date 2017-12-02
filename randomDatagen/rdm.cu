@@ -71,9 +71,9 @@ int main(){
   randfloat<<<1,1>>>(d_state, d_result);
 
   cudaMemcpy(h_result, d_result,DSIZE * sizeof(float), cudaMemcpyDeviceToHost);
-
+  printf("%.6f", h_result[0]);
     // for (int i = 0; i <= 1; i++)
-    printf(h_result[0]);
+    // printf("%d    %d\n", 1.0,h_result[0]);
 
 /* 
   curandState *d_state;
