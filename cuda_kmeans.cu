@@ -1,4 +1,4 @@
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * , * * * * * * * * * * * * * * * * * * * * * * * * */
 /*   File:         cuda_kmeans.cu  (CUDA version)                            */
 /*   Description:  Implementation of simple k-means clustering algorithm     */
 /*                 This program takes an array of N data objects, each with  */

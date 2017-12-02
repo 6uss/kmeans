@@ -20,7 +20,7 @@ __global__ void setup_kernel(curandState *state,unsigned long seed){
 
 __global__ void randfloat(curandState *state, float *result){
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
-    result[idx] = curand_normal(&state[idx]);
+    result[idx] = curand_normal(&state[idx]+idx);
 }
 /*
 __global__ void generate_kernel(curandState *my_curandstate, const unsigned int n,
@@ -68,7 +68,7 @@ int main(){
   cudaMemset(d_result, 0, DSIZE*sizeof(float));
   setup_kernel<<<1,1>>>(d_state,time(NULL));
 
-  randfloat<<<1,1>>>(d_state, d_result);
+  randfloat<<<DSIZE,1>>>(d_state, d_result);
 
   cudaMemcpy(h_result, d_result,DSIZE * sizeof(float), cudaMemcpyDeviceToHost);
 
