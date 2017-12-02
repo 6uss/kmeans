@@ -66,7 +66,7 @@ int main(){
   // cudaMalloc(&d_min_rand_int, sizeof(unsigned));
   // h_min_rand_int = (unsigned *)malloc(sizeof(unsigned));
   cudaMemset(d_result, 0, DSIZE*sizeof(float));
-  setup_kernel<<<1,1>>>(d_state,time(NULL));
+  setup_kernel<<<DSIZE,1>>>(d_state,time(NULL));
 
   randfloat<<<DSIZE,1>>>(d_state, d_result);
 
