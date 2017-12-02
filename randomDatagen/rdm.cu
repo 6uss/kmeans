@@ -73,7 +73,7 @@ int main(){
   cudaMemcpy(h_result, d_result,DSIZE * sizeof(float), cudaMemcpyDeviceToHost);
 
     // for (int i = 0; i <= 1; i++)
-    printf("%d    %d\n", 1,h_result[0]);
+    printf(h_result[0]);
 
 /* 
   curandState *d_state;
