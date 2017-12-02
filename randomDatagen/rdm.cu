@@ -58,7 +58,7 @@ int main(){
   // unsigned *d_max_rand_int, *h_max_rand_int, *d_min_rand_int, *h_min_rand_int;
 
   cudaMalloc(&d_result, DSIZE* sizeof(float));
-  h_result = (float *)malloc(DSIZE*sizeof(float);
+  h_result = (float *)malloc(DSIZE*sizeof(float));
 
     
   // cudaMalloc(&d_max_rand_int, sizeof(unsigned));
@@ -68,12 +68,12 @@ int main(){
   cudaMemset(d_result, 0, DSIZE*sizeof(float));
   setup_kernel<<<1,1>>>(d_state,time(NULL));
 
-  randfloat<<<1,1>()>>(d_state, d_result);
+  randfloat<<<1,1>>>(d_state, d_result);
 
   cudaMemcpy(h_result, d_result,DSIZE * sizeof(float), cudaMemcpyDeviceToHost);
 
     // for (int i = 0; i <= 1; i++)
-    printf("%d    %d\n", i, h_result[i]);
+    printf("%d    %d\n", 1,h_result[i]);
 
 /* 
   curandState *d_state;
