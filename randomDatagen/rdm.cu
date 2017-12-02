@@ -66,15 +66,18 @@ int main(){
   // cudaMalloc(&d_min_rand_int, sizeof(unsigned));
   // h_min_rand_int = (unsigned *)malloc(sizeof(unsigned));
   cudaMemset(d_result, 0, DSIZE*sizeof(float));
-  setup_kernel<<<DSIZE,1>>>(d_state,time(NULL));
+  setup_kernel<<<DSIZE,nTPB>>>(d_state,time(NULL));
 
-  randfloat<<<DSIZE,1>>>(d_state, d_result);
+  randfloat<<<DSIZE,nTPB>>>(d_state, d_result);
 
   cudaMemcpy(h_result, d_result,DSIZE * sizeof(float), cudaMemcpyDeviceToHost);
 
-  for (int i = 0; i < DSIZE; ++i)
+  for (int i = 0; i < DSIZE;)
   {
-    printf("%.6f\n", h_result[0]);
+    printf("%.6f %.6f %.6f %.6f %.6f %.6f %.6f %.6f %.6f" ,
+     h_result[i++], h_result[i++], h_result[i++],
+     h_result[i++], h_result[i++], h_result[i++],
+     h_result[i++], h_result[i++], h_result[i++]);
   }
 
 
