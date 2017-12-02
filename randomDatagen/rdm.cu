@@ -6,9 +6,9 @@
 #define MIN 2
 #define MAX 7
 
-#define ITER 10000000
+// #define ITER 10000000
 
-#define DSIZE 15
+#define DSIZE 10000000
 #define nTPB 256
 
 
