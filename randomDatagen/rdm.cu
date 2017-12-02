@@ -8,7 +8,7 @@
 
 #define ITER 10000000
 
-#define DSIZE 8192*16
+#define DSIZE 15
 #define nTPB 256
 
 
@@ -20,7 +20,7 @@ __global__ void setup_kernel(curandState *state,unsigned long seed){
 
 __global__ void randfloat(curandState *state, float *result){
     int idx = threadIdx.x + blockIdx.x * blockDim.x;
-    result[idx] = curand_uniform(&state[idx]);
+    result[idx] = curand_normal(&state[idx]);
 }
 /*
 __global__ void generate_kernel(curandState *my_curandstate, const unsigned int n,
@@ -71,9 +71,13 @@ int main(){
   randfloat<<<1,1>>>(d_state, d_result);
 
   cudaMemcpy(h_result, d_result,DSIZE * sizeof(float), cudaMemcpyDeviceToHost);
-  printf("%.6f", h_result[0]);
-    // for (int i = 0; i <= 1; i++)
-    // printf("%d    %d\n", 1.0,h_result[0]);
+
+  for (int i = 0; i < DSIZE; ++i)
+  {
+    printf("%.6f\n", h_result[0]);
+  }
+
+
 
 /* 
   curandState *d_state;
