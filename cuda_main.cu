@@ -45,8 +45,8 @@
 #include <sys/types.h>  /* open() */
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <unistd.h>     /* getopt() */
-
+#include <unistd.h>  /*    getopt() */
+// #include "io.h"
 int      _debug;
 #include "kmeans.h"
 

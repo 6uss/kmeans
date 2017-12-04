@@ -55,7 +55,7 @@ inline void checkCuda(cudaError_t e) {
         // cudaGetErrorString() isn't always very helpful. Look up the error
         // number in the cudaError enum in driver_types.h in the CUDA includes
         // directory for a better explanation.
-        err("CUDA Error %d: %s\n", e, cudaGetErrorString(e));
+        // err("CUDA Error %d: %s\n", e, cudaGetErrorString(e));
     }
 }
 
