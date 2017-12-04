@@ -347,7 +347,7 @@ float** cuda_kmeans(float **objects,      /* in: [numObjs][numCoords] */
 
     int d;
 
-        checkCuda(cudaMemcpy(&d, deviceIntermediates,
+        checkCuda(cudaMemcpy(&d,    ,
                   sizeof(int), cudaMemcpyDeviceToHost));
         delta=d;
 
