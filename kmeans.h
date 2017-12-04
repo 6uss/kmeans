@@ -38,7 +38,7 @@
 #include <assert.h>
 
 #define msg(format, ...) do { fprintf(stderr, format, ##__VA_ARGS__); } while (0)
-#define err(format, ...) do { fprintf(stderr, r, ##__VA_ARGS__); exit(1); } while (0)
+#define err(format, ...) do { fprintf(stderr, format, ##__VA_ARGS__); exit(1); } while (0)
 
 #define malloc2D(name, xDim, yDim, type) do {               \
     name = (type **)malloc(xDim * sizeof(type *));          \
@@ -55,7 +55,7 @@ inline void checkCuda(cudaError_t e) {
         // cudaGetErrorString() isn't always very helpful. Look up the error
         // number in the cudaError enum in driver_types.h in the CUDA includes
         // directory for a better explanation.
-        // err("CUDA Error %d: %s\n", e, cudaGetErrorString(e));
+	err("CUDA Error %d: %s\n", e, cudaGetErrorString(e));
     }
 }
 

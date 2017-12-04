@@ -11,7 +11,7 @@ __global__ void hello()
 int main(void)
 {
 	int num_threads = STR_LENGTH;
-	int num_blocks = 1;
+	int num_blocks = 12;
 	hello<<<num_blocks,num_threads>>>();
 	cudaDeviceSynchronize();
 

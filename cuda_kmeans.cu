@@ -117,7 +117,7 @@ void find_nearest_cluster(int numCoords,
     for (int i = threadIdx.x; i < numClusters; i += blockDim.x) {
         for (int j = 0; j < numCoords; j++) {
             int idx=numClusters * j + i;
-            clusters[idx] = deviceClusters[idxs];
+            clusters[idx] = deviceClusters[idx];
 
             // clusters[numClusters * j + i] = deviceClusters[numClusters * j + i];
         }
@@ -347,7 +347,7 @@ float** cuda_kmeans(float **objects,      /* in: [numObjs][numCoords] */
 
     int d;
 
-        checkCuda(cudaMemcpy(&d,    ,
+        checkCuda(cudaMemcpy(&d, deviceIntermediates   ,
                   sizeof(int), cudaMemcpyDeviceToHost));
         delta=d;
 
