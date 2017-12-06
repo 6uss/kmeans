@@ -138,26 +138,25 @@ void find_nearest_cluster(int numCoords,
 
         for (i=1; i<numClusters; i++) {
 
-//             dist = euclid_dist_2(numCoords, numObjs, numClusters,
-  //                                objects, clusters, objectId, i);
+        //dist = euclid_dist_2(numCoords, numObjs, numClusters,
+        //                      objects, clusters, objectId, i);
           
-            /*euclid_dist_2 */
-            /*void find_nearest_cluster(int numCoords,int numObjs,int numClusters,
-                          float *objects,           //  [numCoords][numObjs]
-                          float *deviceClusters,    //  [numCoords][numClusters]
-                          int *membership,          //  [numObjs]
-                          int *intermediates)*/
+        /*euclid_dist_2 */
+        /*void find_nearest_cluster(int numCoords,int numObjs,int numClusters,
+                      float *objects,           //  [numCoords][numObjs]
+                      float *deviceClusters,    //  [numCoords][numClusters]
+                      int *membership,          //  [numObjs]
+                      int *intermediates)*/
             
-            dist=0.0;
+        dist=0.0;
 	    for (int j=0; j < numCoords; j++) {
-               	float obj=objects[numObjs * j + objectId] - clusters[numClusters * j + i];
-               	dist+=obj*obj;
+           	float obj=objects[numObjs * j + objectId] - clusters[numClusters * j + i];
+           	dist+=obj*obj;
             
-		    /*ans += (objects[numObjs * i + objectId] - clusters[numClusters * i + clusterId]) *
-                       (objects[numObjs * i + objectId] - clusters[numClusters * i + clusterId]);*/
-            }
+	    /*ans += (objects[numObjs * i + objectId] - clusters[numClusters * i + clusterId]) *
+                   (objects[numObjs * i + objectId] - clusters[numClusters * i + clusterId]);*/
+        }
 
-//bj=objects[numObjsobj=objects[numObjsobj=objects[numObjS
             /* no need square root */
             if (dist < min_dist) { /* find the min and its array index */
                 min_dist = dist;
@@ -314,62 +313,23 @@ float** cuda_kmeans(float **objects,      /* in: [numObjs][numCoords] */
         numThreadsPerClusterBlock * sizeof(unsigned char);
 #endif
 
-    const unsigned int numReductionThreads =
-
-
-        nextPowerOfTwo(numClusterBlocks);
-    const unsigned int reductionBlockSharedDataSize =
-        numReductionThreads * sizeof(unsigned int);
-
-    checkCuda(cudaMalloc(&deviceObjects, numObjs*numCoords*sizeof(float)));
-    checkCuda(cudaMalloc(&deviceClusters, numClusters*numCoords*sizeof(float)));
-    checkCuda(cudaMalloc(&deviceMembership, numObjs*sizeof(int)));
-    checkCuda(cudaMalloc(&deviceIntermediates, numReductionThreads*sizeof(unsigned int)));
-
-    checkCuda(cudaMemcpy(deviceObjects, dimObjects[0],
-              numObjs*numCoords*sizeof(float), cudaMemcpyHostToDevice));
-    checkCuda(cudaMemcpy(deviceMembership, membership,
-              numObjs*sizeof(int), cudaMemcpyHostToDevice));
-
-
-    do {
-        checkCuda(cudaMemcpy(deviceClusters, dimClusters[0],
-                  numClusters*numCoords*sizeof(float), cudaMemcpyHostToDevice));
-
-        find_nearest_cluster
-            <<< numClusterBlocks, numThreadsPerClusterBlock, clusterBlockSharedDataSize >>>
-            (numCoords, numObjs, numClusters,
-             deviceObjects, deviceClusters, deviceMembership, deviceIntermediates);
-
-        cudaDeviceSynchronize(); checkLastCudaError();
-
-        compute_delta <<< 1, numReductionThreads, reductionBlockSharedDataSize >>>
-            (deviceIntermediates, numClusterBlocks, numReductionThreads);
-
-        cudaDeviceSynchronize(); checkLastCudaError();
-
-        int d;
-
-        checkCuda(cudaMemcpy(&d, deviceIntermediates,
-                  sizeof(int), cudaMemcpyDeviceToHost));
-        delta = (float)d;
     // const unsigned int numReductionThreads =
-    //     min(1024,nextPowerOfTwo(numClusterBlocks));
-    // const unsigned int numReductionBlocks =
-    //     nextPowerOfTwo(numClusterBlocks)/1024 + 1;
+
+
+    //     nextPowerOfTwo(numClusterBlocks);
     // const unsigned int reductionBlockSharedDataSize =
     //     numReductionThreads * sizeof(unsigned int);
 
     // checkCuda(cudaMalloc(&deviceObjects, numObjs*numCoords*sizeof(float)));
     // checkCuda(cudaMalloc(&deviceClusters, numClusters*numCoords*sizeof(float)));
     // checkCuda(cudaMalloc(&deviceMembership, numObjs*sizeof(int)));
-    // checkCuda(cudaMalloc(&deviceIntermediates, numReductionBlocks*numReductionThreads*sizeof(unsigned int)));
+    // checkCuda(cudaMalloc(&deviceIntermediates, numReductionThreads*sizeof(unsigned int)));
 
     // checkCuda(cudaMemcpy(deviceObjects, dimObjects[0],
     //           numObjs*numCoords*sizeof(float), cudaMemcpyHostToDevice));
     // checkCuda(cudaMemcpy(deviceMembership, membership,
     //           numObjs*sizeof(int), cudaMemcpyHostToDevice));
-        
+
 
     // do {
     //     checkCuda(cudaMemcpy(deviceClusters, dimClusters[0],
@@ -382,12 +342,51 @@ float** cuda_kmeans(float **objects,      /* in: [numObjs][numCoords] */
 
     //     cudaDeviceSynchronize(); checkLastCudaError();
 
-    //     compute_delta <<< numReductionBlocks, numReductionThreads, reductionBlockSharedDataSize >>>
+    //     compute_delta <<< 1, numReductionThreads, reductionBlockSharedDataSize >>>
     //         (deviceIntermediates, numClusterBlocks, numReductionThreads);
 
     //     cudaDeviceSynchronize(); checkLastCudaError();
 
-    // int d;
+    //     int d;
+
+    //     checkCuda(cudaMemcpy(&d, deviceIntermediates,
+    //               sizeof(int), cudaMemcpyDeviceToHost));
+    //     delta = (float)d;
+    const unsigned int numReductionThreads =
+        min(1024,nextPowerOfTwo(numClusterBlocks));
+    const unsigned int numReductionBlocks =
+        nextPowerOfTwo(numClusterBlocks)/1024 + 1;
+    const unsigned int reductionBlockSharedDataSize =
+        numReductionThreads * sizeof(unsigned int);
+
+    checkCuda(cudaMalloc(&deviceObjects, numObjs*numCoords*sizeof(float)));
+    checkCuda(cudaMalloc(&deviceClusters, numClusters*numCoords*sizeof(float)));
+    checkCuda(cudaMalloc(&deviceMembership, numObjs*sizeof(int)));
+    checkCuda(cudaMalloc(&deviceIntermediates, numReductionBlocks*numReductionThreads*sizeof(unsigned int)));
+
+    checkCuda(cudaMemcpy(deviceObjects, dimObjects[0],
+              numObjs*numCoords*sizeof(float), cudaMemcpyHostToDevice));
+    checkCuda(cudaMemcpy(deviceMembership, membership,
+              numObjs*sizeof(int), cudaMemcpyHostToDevice));
+        
+
+    do {
+        checkCuda(cudaMemcpy(deviceClusters, dimClusters[0],
+                  numClusters*numCoords*sizeof(float), cudaMemcpyHostToDevice));
+
+        find_nearest_cluster
+            <<< numClusterBlocks, numThreadsPerClusterBlock, clusterBlockSharedDataSize >>>
+            (numCoords, numObjs, numClusters,
+             deviceObjects, deviceClusters, deviceMembership, deviceIntermediates);
+
+        cudaDeviceSynchronize(); checkLastCudaError();
+
+        compute_delta <<< numReductionBlocks, numReductionThreads, reductionBlockSharedDataSize >>>
+            (deviceIntermediates, numClusterBlocks, numReductionThreads);
+
+        cudaDeviceSynchronize(); checkLastCudaError();
+
+    int d;
 
         checkCuda(cudaMemcpy(&d, deviceIntermediates   ,
                   sizeof(int), cudaMemcpyDeviceToHost));
