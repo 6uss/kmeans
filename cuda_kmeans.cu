@@ -138,8 +138,8 @@ void find_nearest_cluster(int numCoords,
 
         for (i=1; i<numClusters; i++) {
 
-            // dist = euclid_dist_2(numCoords, numObjs, numClusters,
-            //                      objects, clusters, objectId, i);
+//             dist = euclid_dist_2(numCoords, numObjs, numClusters,
+  //                                objects, clusters, objectId, i);
           
             /*euclid_dist_2 */
             /*void find_nearest_cluster(int numCoords,int numObjs,int numClusters,
@@ -147,14 +147,17 @@ void find_nearest_cluster(int numCoords,
                           float *deviceClusters,    //  [numCoords][numClusters]
                           int *membership,          //  [numObjs]
                           int *intermediates)*/
-            for (int j = 0; j < numCoords; j++) {
-                float obj=objects[numObjs * j + objectId] - clusters[numClusters * j + i];
-                dist+=obj*obj;
-
-                /*ans += (objects[numObjs * i + objectId] - clusters[numClusters * i + clusterId]) *
+            
+            dist=0.0;
+	    for (int j=0; j < numCoords; j++) {
+               	float obj=objects[numObjs * j + objectId] - clusters[numClusters * j + i];
+               	dist+=obj*obj;
+            
+		    /*ans += (objects[numObjs * i + objectId] - clusters[numClusters * i + clusterId]) *
                        (objects[numObjs * i + objectId] - clusters[numClusters * i + clusterId]);*/
             }
 
+//bj=objects[numObjsobj=objects[numObjsobj=objects[numObjS
             /* no need square root */
             if (dist < min_dist) { /* find the min and its array index */
                 min_dist = dist;
@@ -199,7 +202,7 @@ void compute_delta(int *deviceIntermediates,
     //  Copy global intermediate values into shared memory.
     int idx=blockDim.x * blockIdx.x + threadIdx.x;
 
-    intermediates[threadIdx.x] =
+    intermediates[idx] =
         (idx < numIntermediates) ? deviceIntermediates[idx] : 0;
 
     __syncthreads();
