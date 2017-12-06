@@ -27,3 +27,4 @@ profiles
 *.membership
 .exe
 .exp
+.class
