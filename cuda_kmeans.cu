@@ -55,7 +55,8 @@ static inline int nextPowerOfTwo(int n) {
     n = n >>  4 | n;
     n = n >>  8 | n;
     n = n >> 16 | n;
-//  n = n >> 32 | n;    //  For 64-bit ints
+    n = n >> 32 | n;    //  For 64-bit ints
+   // n = n >> 64 | n;    //  For 128-bit ints
 
     return ++n;
 }
@@ -201,7 +202,7 @@ void compute_delta(int *deviceIntermediates,
     //  Copy global intermediate values into shared memory.
     int idx=blockDim.x * blockIdx.x + threadIdx.x;
 
-    intermediates[idx] =
+    intermediates[threadIdx.x] =
         (idx < numIntermediates) ? deviceIntermediates[idx] : 0;
 
     __syncthreads();
@@ -209,13 +210,13 @@ void compute_delta(int *deviceIntermediates,
     //  numIntermediates2 *must* be a power of two!
     for (unsigned int s = numIntermediates2 / 2; s > 0; s >>= 1) {
         if (idx < s) {
-            intermediates[idx] += intermediates[idx + s];
+            intermediates[threadIdx.x] += intermediates[threadIdx.x + s];
         }
         __syncthreads();
     }
 
-    if (idx == 0) {
-        atomicAdd(deviceIntermediates, intermediates[idx]);
+    if (threadIdx.x == 0) {
+        atomicAdd(deviceIntermediates, intermediates[threadIdx.x]);
     }
 }
 
@@ -313,12 +314,12 @@ float** cuda_kmeans(float **objects,      /* in: [numObjs][numCoords] */
         numThreadsPerClusterBlock * sizeof(unsigned char);
 #endif
 
-    const unsigned int numReductionThreads =
-
-
+ const unsigned int numReductionThreads =
         min(1024,nextPowerOfTwo(numClusterBlocks));
+
     const unsigned int numReductionBlocks =
         nextPowerOfTwo(numClusterBlocks)/1024 + 1;
+
     const unsigned int reductionBlockSharedDataSize =
         numReductionThreads * sizeof(unsigned int);
 
@@ -331,7 +332,6 @@ float** cuda_kmeans(float **objects,      /* in: [numObjs][numCoords] */
               numObjs*numCoords*sizeof(float), cudaMemcpyHostToDevice));
     checkCuda(cudaMemcpy(deviceMembership, membership,
               numObjs*sizeof(int), cudaMemcpyHostToDevice));
-        
 
 
     do {
@@ -343,21 +343,19 @@ float** cuda_kmeans(float **objects,      /* in: [numObjs][numCoords] */
             (numCoords, numObjs, numClusters,
              deviceObjects, deviceClusters, deviceMembership, deviceIntermediates);
 
-        cudaDeviceSynchronize(); checkLastCudaError();
+        cudaDeviceSynchronize(); 
+        checkLastCudaError();
 
         compute_delta <<< numReductionBlocks, numReductionThreads, reductionBlockSharedDataSize >>>
             (deviceIntermediates, numClusterBlocks, numReductionThreads);
 
         cudaDeviceSynchronize(); checkLastCudaError();
 
-    int d;
-
+        int d;
 
         checkCuda(cudaMemcpy(&d, deviceIntermediates,
                   sizeof(int), cudaMemcpyDeviceToHost));
-        delta=d;
-
-        
+        delta = (float)d;
         checkCuda(cudaMemcpy(membership, deviceMembership,
                   numObjs*sizeof(int), cudaMemcpyDeviceToHost));
 
