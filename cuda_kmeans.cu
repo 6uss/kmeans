@@ -209,12 +209,12 @@ void compute_delta(int *deviceIntermediates,
     //  numIntermediates2 *must* be a power of two!
     for (unsigned int s = numIntermediates2 / 2; s > 0; s >>= 1) {
         if (idx < s) {
-            intermediates[threadIdx.x] += intermediates[threadIdx.x + s];
+            intermediates[idx] += intermediates[idx + s];
         }
         __syncthreads();
     }
 
-    if (threadIdx.x == 0) {
+    if (idx == 0) {
         atomicAdd(deviceIntermediates, intermediates[threadIdx.x]);
     }
 }
