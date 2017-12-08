@@ -55,7 +55,7 @@ static inline int nextPowerOfTwo(int n) {
     n = n >>  4 | n;
     n = n >>  8 | n;
     n = n >> 16 | n;
-    n = n >> 32 | n;    //  For 64-bit ints
+   // n = n >> 32 | n;    //  For 64-bit ints
    // n = n >> 64 | n;    //  For 128-bit ints
 
     return ++n;
